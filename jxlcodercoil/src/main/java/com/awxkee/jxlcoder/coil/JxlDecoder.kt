@@ -39,6 +39,7 @@ import coil.request.Options
 import coil.size.Scale
 import coil.size.pxOrElse
 import com.awxkee.jxlcoder.JxlCoder
+import com.awxkee.jxlcoder.JxlResizeFilter
 import com.awxkee.jxlcoder.PreferredColorConfig
 import com.awxkee.jxlcoder.ScaleMode
 import kotlinx.coroutines.runInterruptible
@@ -97,6 +98,7 @@ class JxlDecoder(
                 dstHeight,
                 preferredColorConfig = mPreferredColorConfig,
                 scaleMode,
+                JxlResizeFilter.CATMULL_ROM,
             )
         return@runInterruptible DecodeResult(
             BitmapDrawable(
@@ -105,6 +107,7 @@ class JxlDecoder(
             ), true
         )
     }
+
     class Factory : Decoder.Factory {
         override fun create(
             result: SourceResult,

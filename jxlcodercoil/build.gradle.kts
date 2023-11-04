@@ -15,7 +15,7 @@ afterEvaluate {
             create<MavenPublication>("mavenJava") {
                 groupId = "com.github.awxkee"
                 artifactId = "jxl-coder-coil"
-                version = "1.5.0"
+                version = "1.5.5"
                 from(components.findByName("release"))
 //                artifact("androidSourcesJar")
             }
@@ -33,11 +33,10 @@ android {
     }
 
     namespace = "com.awxkee.jxlcoder.coil"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 33
     }
 
     buildTypes {
@@ -63,5 +62,5 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     api("io.coil-kt:coil:2.4.0")
-    api("com.github.awxkee:jxl-coder:1.5.4")
+    api("com.github.awxkee:jxl-coder:1.5.5")
 }

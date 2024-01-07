@@ -98,7 +98,7 @@ class JxlDecoder(
                 dstHeight,
                 preferredColorConfig = mPreferredColorConfig,
                 scaleMode,
-                JxlResizeFilter.CATMULL_ROM,
+                JxlResizeFilter.BILINEAR,
             )
         return@runInterruptible DecodeResult(
             BitmapDrawable(

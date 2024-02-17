@@ -15,7 +15,7 @@ afterEvaluate {
             create<MavenPublication>("mavenJava") {
                 groupId = "com.github.awxkee"
                 artifactId = "jxl-coder-coil"
-                version = "1.9.0"
+                version = "1.10.0"
                 from(components.findByName("release"))
 //                artifact("androidSourcesJar")
             }
@@ -62,5 +62,5 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     api("io.coil-kt:coil:2.5.0")
-    api("com.github.awxkee:jxl-coder:1.9.0")
+    api("com.github.awxkee:jxl-coder:1.10.0")
 }

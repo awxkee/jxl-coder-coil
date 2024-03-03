@@ -72,7 +72,7 @@ class JxlDecoder(
 
         if (options.size == coil.size.Size.ORIGINAL) {
             val originalImage =
-                JxlCoder().decode(
+                JxlCoder.decode(
                     sourceData,
                     preferredColorConfig = mPreferredColorConfig
                 )
@@ -92,7 +92,7 @@ class JxlDecoder(
         }
 
         val originalImage =
-            JxlCoder().decodeSampled(
+            JxlCoder.decodeSampled(
                 sourceData,
                 dstWidth,
                 dstHeight,

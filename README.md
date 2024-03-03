@@ -23,7 +23,7 @@ repositories {
 ```
 
 ```groovy
-implementation 'com.github.awxkee:jxl-coder-coil:1.11.0' // or any version above picker from release tags
+implementation 'com.github.awxkee:jxl-coder-coil:2.0.0' // or any version above picker from release tags
 ```
 
 # Disclaimer

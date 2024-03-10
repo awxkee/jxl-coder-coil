@@ -12,6 +12,14 @@ val imageLoader = ImageLoader.Builder(context)
         add(JxlDecoder.Factory())
     }
     .build()
+
+// If you would like to support an animated JPEG XL files
+
+val imageLoader = ImageLoader.Builder(context)
+    .components {
+        add(AnimatedJxlDecoder.Factory())
+    }
+    .build()
 ```
 
 # Add Jitpack repository
@@ -23,7 +31,7 @@ repositories {
 ```
 
 ```groovy
-implementation 'com.github.awxkee:jxl-coder-coil:2.1.2' // or any version above picker from release tags
+implementation 'com.github.awxkee:jxl-coder-coil:2.1.3' // or any version above picker from release tags
 ```
 
 # Disclaimer

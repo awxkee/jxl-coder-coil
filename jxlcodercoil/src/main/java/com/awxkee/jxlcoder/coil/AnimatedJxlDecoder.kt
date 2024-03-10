@@ -50,7 +50,7 @@ import kotlinx.coroutines.runInterruptible
 import okio.BufferedSource
 import okio.ByteString.Companion.toByteString
 
-class AnimatedJxlDecoder(
+public class AnimatedJxlDecoder(
     private val source: SourceResult,
     private val options: Options,
     private val context: Context
@@ -120,7 +120,7 @@ class AnimatedJxlDecoder(
         firstFrameAsPlaceholder = true
     )
 
-    class Factory(private val context: Context) : Decoder.Factory {
+    public class Factory(private val context: Context) : Decoder.Factory {
         override fun create(
             result: SourceResult,
             options: Options,

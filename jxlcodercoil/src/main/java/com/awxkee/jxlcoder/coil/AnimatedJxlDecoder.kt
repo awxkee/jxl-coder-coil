@@ -50,28 +50,6 @@ import kotlinx.coroutines.runInterruptible
 import okio.BufferedSource
 import okio.ByteString.Companion.toByteString
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import android.os.Build
-import coil.ImageLoader
-import coil.decode.DecodeResult
-import coil.decode.Decoder
-import coil.fetch.SourceResult
-import coil.request.Options
-import coil.size.Scale
-import coil.size.Size
-import coil.size.pxOrElse
-import com.awxkee.jxlcoder.JxlAnimatedImage
-import com.awxkee.jxlcoder.JxlResizeFilter
-import com.awxkee.jxlcoder.PreferredColorConfig
-import com.awxkee.jxlcoder.ScaleMode
-import com.awxkee.jxlcoder.animation.AnimatedDrawable
-import com.awxkee.jxlcoder.animation.JxlAnimatedStore
-import kotlinx.coroutines.runInterruptible
-import okio.BufferedSource
-import okio.ByteString.Companion.toByteString
-
 public class AnimatedJxlDecoder(
     private val source: SourceResult,
     private val options: Options,
@@ -143,7 +121,7 @@ public class AnimatedJxlDecoder(
         firstFrameAsPlaceholder = true
     )
 
-    class Factory(
+    public class Factory(
         private val context: Context,
         private val preheatFrames: Int = 6
     ) : Decoder.Factory {

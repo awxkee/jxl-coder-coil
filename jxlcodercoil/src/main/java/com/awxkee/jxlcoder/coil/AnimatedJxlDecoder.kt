@@ -30,6 +30,7 @@ package com.awxkee.jxlcoder.coil
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import coil.ImageLoader
@@ -81,7 +82,7 @@ public class AnimatedJxlDecoder(
                 preferredColorConfig = mPreferredColorConfig
             )
             return@runInterruptible DecodeResult(
-                drawable = originalImage.animatedDrawable(),
+                drawable = originalImage.drawable(),
                 isSampled = false
             )
         }
@@ -99,8 +100,9 @@ public class AnimatedJxlDecoder(
             scaleMode = scaleMode,
             jxlResizeFilter = JxlResizeFilter.BILINEAR
         )
-        return@runInterruptible DecodeResult(
-            drawable = originalImage.animatedDrawable(
+
+        DecodeResult(
+            drawable = originalImage.drawable(
                 dstWidth = dstWidth,
                 dstHeight = dstHeight
             ),
@@ -108,18 +110,29 @@ public class AnimatedJxlDecoder(
         )
     }
 
-    private fun JxlAnimatedImage.animatedDrawable(
+    private fun JxlAnimatedImage.drawable(
         dstWidth: Int = 0,
         dstHeight: Int = 0
-    ): Drawable = AnimatedDrawable(
-        frameStore = JxlAnimatedStore(
-            jxlAnimatedImage = this,
-            targetWidth = dstWidth,
-            targetHeight = dstHeight
-        ),
-        preheatFrames = preheatFrames,
-        firstFrameAsPlaceholder = true
-    )
+    ): Drawable = if (numberOfFrames > 1) {
+        AnimatedDrawable(
+            frameStore = JxlAnimatedStore(
+                jxlAnimatedImage = this,
+                targetWidth = dstWidth,
+                targetHeight = dstHeight
+            ),
+            preheatFrames = preheatFrames,
+            firstFrameAsPlaceholder = true
+        )
+    } else {
+        BitmapDrawable(
+            context.resources,
+            getFrame(
+                frame = 0,
+                scaleWidth = dstWidth,
+                scaleHeight = dstHeight
+            )
+        )
+    }
 
     public class Factory(
         private val context: Context,

@@ -50,7 +50,7 @@ import kotlinx.coroutines.runInterruptible
 import okio.BufferedSource
 import okio.ByteString.Companion.toByteString
 
-internal class AnimatedJxlDecoder(
+class AnimatedJxlDecoder(
     private val source: SourceResult,
     private val options: Options,
     private val context: Context

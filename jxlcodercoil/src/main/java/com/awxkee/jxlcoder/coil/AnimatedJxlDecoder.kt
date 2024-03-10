@@ -30,8 +30,7 @@ package com.awxkee.jxlcoder.coil
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.AnimationDrawable
-import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import coil.ImageLoader
 import coil.decode.DecodeResult
@@ -45,11 +44,13 @@ import com.awxkee.jxlcoder.JxlAnimatedImage
 import com.awxkee.jxlcoder.JxlResizeFilter
 import com.awxkee.jxlcoder.PreferredColorConfig
 import com.awxkee.jxlcoder.ScaleMode
+import com.awxkee.jxlcoder.animation.AnimatedDrawable
+import com.awxkee.jxlcoder.animation.JxlAnimatedStore
 import kotlinx.coroutines.runInterruptible
 import okio.BufferedSource
 import okio.ByteString.Companion.toByteString
 
-class AnimatedJxlDecoder(
+internal class AnimatedJxlDecoder(
     private val source: SourceResult,
     private val options: Options,
     private val context: Context
@@ -109,26 +110,15 @@ class AnimatedJxlDecoder(
     private fun JxlAnimatedImage.animatedDrawable(
         dstWidth: Int = 0,
         dstHeight: Int = 0
-    ): AnimationDrawable = AnimationDrawable().also { image ->
-        val frames = numberOfFrames
-        repeat(frames) { frame ->
-            val duration = if (frames == 1) {
-                Int.MAX_VALUE
-            } else getFrameDuration(frame)
-
-            image.addFrame(
-                BitmapDrawable(
-                    context.resources,
-                    getFrame(
-                        frame = frame,
-                        scaleWidth = dstWidth,
-                        scaleHeight = dstHeight
-                    )
-                ),
-                duration
-            )
-        }
-    }
+    ): Drawable = AnimatedDrawable(
+        frameStore = JxlAnimatedStore(
+            jxlAnimatedImage = this,
+            targetWidth = dstWidth,
+            targetHeight = dstHeight
+        ),
+        preheatFrames = 6,
+        firstFrameAsPlaceholder = true
+    )
 
     class Factory(private val context: Context) : Decoder.Factory {
         override fun create(

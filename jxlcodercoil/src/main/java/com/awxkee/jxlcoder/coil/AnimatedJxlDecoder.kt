@@ -30,6 +30,7 @@ package com.awxkee.jxlcoder.coil
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
 import coil.ImageLoader
@@ -53,7 +54,8 @@ import okio.ByteString.Companion.toByteString
 public class AnimatedJxlDecoder(
     private val source: SourceResult,
     private val options: Options,
-    private val context: Context
+    private val context: Context,
+    private val preheatFrames: Int
 ) : Decoder {
 
     override suspend fun decode(): DecodeResult = runInterruptible {
@@ -80,7 +82,7 @@ public class AnimatedJxlDecoder(
                 preferredColorConfig = mPreferredColorConfig
             )
             return@runInterruptible DecodeResult(
-                drawable = originalImage.animatedDrawable(),
+                drawable = originalImage.drawable(),
                 isSampled = false
             )
         }
@@ -98,8 +100,9 @@ public class AnimatedJxlDecoder(
             scaleMode = scaleMode,
             jxlResizeFilter = JxlResizeFilter.BILINEAR
         )
-        return@runInterruptible DecodeResult(
-            drawable = originalImage.animatedDrawable(
+
+        DecodeResult(
+            drawable = originalImage.drawable(
                 dstWidth = dstWidth,
                 dstHeight = dstHeight
             ),
@@ -107,26 +110,45 @@ public class AnimatedJxlDecoder(
         )
     }
 
-    private fun JxlAnimatedImage.animatedDrawable(
+    private fun JxlAnimatedImage.drawable(
         dstWidth: Int = 0,
         dstHeight: Int = 0
-    ): Drawable = AnimatedDrawable(
-        frameStore = JxlAnimatedStore(
-            jxlAnimatedImage = this,
-            targetWidth = dstWidth,
-            targetHeight = dstHeight
-        ),
-        preheatFrames = 6,
-        firstFrameAsPlaceholder = true
-    )
+    ): Drawable = if (numberOfFrames > 1) {
+        AnimatedDrawable(
+            frameStore = JxlAnimatedStore(
+                jxlAnimatedImage = this,
+                targetWidth = dstWidth,
+                targetHeight = dstHeight
+            ),
+            preheatFrames = preheatFrames,
+            firstFrameAsPlaceholder = true
+        )
+    } else {
+        BitmapDrawable(
+            context.resources,
+            getFrame(
+                frame = 0,
+                scaleWidth = dstWidth,
+                scaleHeight = dstHeight
+            )
+        )
+    }
 
-    public class Factory(private val context: Context) : Decoder.Factory {
+    public class Factory(
+        private val context: Context,
+        private val preheatFrames: Int = 6
+    ) : Decoder.Factory {
         override fun create(
             result: SourceResult,
             options: Options,
             imageLoader: ImageLoader
         ) = if (isJXL(result.source.source())) {
-            AnimatedJxlDecoder(result, options, context)
+            AnimatedJxlDecoder(
+                source = result,
+                options = options,
+                context = context,
+                preheatFrames = preheatFrames
+            )
         } else null
 
         companion object {

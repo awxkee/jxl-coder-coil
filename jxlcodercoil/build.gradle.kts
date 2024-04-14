@@ -1,7 +1,11 @@
+import com.vanniktech.maven.publish.AndroidMultiVariantLibrary
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("maven-publish")
+    id("signing")
+    id("com.vanniktech.maven.publish") version "0.28.0"
 }
 
 task("androidSourcesJar", Jar::class) {
@@ -9,20 +13,48 @@ task("androidSourcesJar", Jar::class) {
     from(android.sourceSets.getByName("main").java.srcDirs)
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("mavenJava") {
-                groupId = "com.github.awxkee"
-                artifactId = "jxl-coder-coil"
-                version = "1.10.0"
-                from(components.findByName("release"))
-//                artifact("androidSourcesJar")
+mavenPublishing {
+    configure(
+        AndroidMultiVariantLibrary(
+            sourcesJar = true,
+            publishJavadocJar = true,
+        )
+    )
+
+    coordinates("io.github.awxkee", "jxl-coder-coil", System.getenv("VERSION_NAME") ?: "0.0.10")
+
+    pom {
+        name.set("Jxl Coder Coil")
+        description.set("JPEG XL decoder for android Coil")
+        inceptionYear.set("2023")
+        url.set("https://github.com/awxkee/jxl-coder-coil")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                distribution.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
+            license {
+                name.set("The 3-Clause BSD License")
+                url.set("https://opensource.org/license/bsd-3-clause")
+                description.set("https://opensource.org/license/bsd-3-clause")
+            }
+        }
+        developers {
+            developer {
+                id.set("awxkee")
+                name.set("Radzivon Bartoshyk")
+                url.set("https://github.com/awxkee")
+                email.set("radzivon.bartoshyk@proton.me")
+            }
+        }
+        scm {
+            url.set("https://github.com/awxkee/jxl-coder-coil")
+            connection.set("scm:git:git@github.com:awxkee/jxl-coder-coil.git")
+            developerConnection.set("scm:git:ssh://git@github.com/awxkee/jxl-coder-coil.git")
         }
     }
 }
-
 
 android {
     publishing {

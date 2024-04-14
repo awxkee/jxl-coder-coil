@@ -22,7 +22,13 @@ val imageLoader = ImageLoader.Builder(context)
     .build()
 ```
 
-# Add Jitpack repository
+# Add repository
+
+```groovy
+implementation 'io.github.awxkee:jxl-coder-coil:2.2.0' // or any version above picker from release tags
+```
+
+### ~~Add Jitpack repository~~ Since 2.2.0 deprecated
 
 ```groovy
 repositories {

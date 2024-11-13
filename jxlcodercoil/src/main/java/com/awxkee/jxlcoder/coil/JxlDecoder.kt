@@ -31,13 +31,18 @@ package com.awxkee.jxlcoder.coil
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Build
-import coil.ImageLoader
-import coil.decode.DecodeResult
-import coil.decode.Decoder
-import coil.fetch.SourceResult
-import coil.request.Options
-import coil.size.Scale
-import coil.size.pxOrElse
+import coil3.ImageLoader
+import coil3.asImage
+import coil3.decode.DecodeResult
+import coil3.decode.Decoder
+import coil3.fetch.SourceFetchResult
+import coil3.request.Options
+import coil3.request.allowRgb565
+import coil3.request.bitmapConfig
+import coil3.size.Dimension
+import coil3.size.Scale
+import coil3.size.ScaleDrawable
+import coil3.size.pxOrElse
 import com.awxkee.jxlcoder.JxlCoder
 import com.awxkee.jxlcoder.JxlResizeFilter
 import com.awxkee.jxlcoder.PreferredColorConfig
@@ -47,42 +52,45 @@ import okio.BufferedSource
 import okio.ByteString.Companion.toByteString
 
 class JxlDecoder(
-    private val source: SourceResult,
+    private val source: SourceFetchResult,
     private val options: Options,
     private val imageLoader: ImageLoader,
+    private val scaleFilter: JxlResizeFilter,
     private val exceptionLogger: ((Exception) -> Unit)? = null
 ) : Decoder {
 
     override suspend fun decode(): DecodeResult? = runInterruptible {
         try {
-            // ColorSpace is preferred to be ignored due to lib is trying to handle all color profile by itself
+            // ColorSpace is preferred to be ignored due to lib is trying to handle all color profiles by itself
             val sourceData = source.source.source().readByteArray()
 
-            var mPreferredColorConfig: PreferredColorConfig = when (options.config) {
+            var mPreferredColorConfig: PreferredColorConfig = when (options.bitmapConfig) {
                 Bitmap.Config.ALPHA_8 -> PreferredColorConfig.RGBA_8888
                 Bitmap.Config.RGB_565 -> if (options.allowRgb565) PreferredColorConfig.RGB_565 else PreferredColorConfig.DEFAULT
                 Bitmap.Config.ARGB_8888 -> PreferredColorConfig.RGBA_8888
                 else -> PreferredColorConfig.DEFAULT
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && options.config == Bitmap.Config.RGBA_F16) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && options.bitmapConfig == Bitmap.Config.RGBA_F16) {
                 mPreferredColorConfig = PreferredColorConfig.RGBA_F16
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && options.config == Bitmap.Config.HARDWARE) {
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && options.bitmapConfig == Bitmap.Config.HARDWARE) {
                 mPreferredColorConfig = PreferredColorConfig.HARDWARE
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && options.config == Bitmap.Config.RGBA_1010102) {
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && options.bitmapConfig == Bitmap.Config.RGBA_1010102) {
                 mPreferredColorConfig = PreferredColorConfig.RGBA_1010102
             }
 
-            if (options.size == coil.size.Size.ORIGINAL) {
+            if (options.size == coil3.size.Size.ORIGINAL || (options.size.width is Dimension.Undefined && options.size.height is Dimension.Undefined)) {
                 val originalImage =
                     JxlCoder.decode(
                         sourceData,
                         preferredColorConfig = mPreferredColorConfig
                     )
                 return@runInterruptible DecodeResult(
-                    BitmapDrawable(
-                        options.context.resources,
-                        originalImage
-                    ), false
+                    ScaleDrawable(
+                        BitmapDrawable(
+                            options.context.resources,
+                            originalImage
+                        ), options.scale
+                    ).asImage(), false
                 )
             }
 
@@ -100,13 +108,15 @@ class JxlDecoder(
                     dstHeight,
                     preferredColorConfig = mPreferredColorConfig,
                     scaleMode,
-                    JxlResizeFilter.BILINEAR,
+                    scaleFilter,
                 )
             return@runInterruptible DecodeResult(
-                BitmapDrawable(
-                    options.context.resources,
-                    originalImage
-                ), true
+                ScaleDrawable(
+                    BitmapDrawable(
+                        options.context.resources,
+                        originalImage
+                    ), options.scale
+                ).asImage(), true
             )
         } catch (e: Exception) {
             exceptionLogger?.invoke(e)
@@ -114,13 +124,17 @@ class JxlDecoder(
         }
     }
 
-    class Factory(private val exceptionLogger: ((Exception) -> Unit)? = null) : Decoder.Factory {
+    class Factory(
+        private val scaleFilter: JxlResizeFilter = JxlResizeFilter.BILINEAR,
+        private val exceptionLogger: ((Exception) -> Unit)? = null
+    ) :
+        Decoder.Factory {
         override fun create(
-            result: SourceResult,
+            result: SourceFetchResult,
             options: Options,
             imageLoader: ImageLoader
         ) = if (isJXL(result.source.source())) {
-            JxlDecoder(result, options, imageLoader, exceptionLogger = exceptionLogger)
+            JxlDecoder(result, options, imageLoader, scaleFilter, exceptionLogger = exceptionLogger)
         } else null
 
         private val MAGIC_1 = byteArrayOf(0xFF.toByte(), 0x0A).toByteString()

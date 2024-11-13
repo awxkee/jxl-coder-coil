@@ -6,6 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -13,9 +15,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import coil.ImageLoader
-import coil.compose.AsyncImage
+import androidx.compose.ui.unit.dp
+import coil3.ImageLoader
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.request.bitmapConfig
 import com.awxkee.jxlcoder.app.jxlcoil.ui.theme.JxlCoilTheme
 import com.awxkee.jxlcoder.coil.JxlDecoder
 
@@ -38,17 +45,23 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         AsyncImage(
-                            model = "https://backup-csh.fra1.digitaloceanspaces.com/pexels-emre-ug%CC%86urlar-19716967.jxl",
+                            model = ImageRequest.Builder(context = LocalContext.current)
+                                .data("https://backup-csh.fra1.digitaloceanspaces.com/pexels-emre-ug%CC%86urlar-19716967.jxl")
+                                .build(),
                             contentDescription = null,
                             imageLoader = imageLoader,
                         )
                         AsyncImage(
-                            model = "https://backup-csh.fra1.digitaloceanspaces.com/pexels-thibaut-tattevin-18273081.jxl",
+                            model = ImageRequest.Builder(context = LocalContext.current)
+                                .data("https://backup-csh.fra1.digitaloceanspaces.com/pexels-thibaut-tattevin-18273081.jxl")
+                                .build(),
                             contentDescription = null,
                             imageLoader = imageLoader,
                         )
                         AsyncImage(
-                            model = "https://backup-csh.fra1.digitaloceanspaces.com/dark_street.jxl",
+                            model = ImageRequest.Builder(context = LocalContext.current)
+                                .data("https://backup-csh.fra1.digitaloceanspaces.com/dark_street.jxl")
+                                .build(),
                             contentDescription = null,
                             imageLoader = imageLoader,
                         )

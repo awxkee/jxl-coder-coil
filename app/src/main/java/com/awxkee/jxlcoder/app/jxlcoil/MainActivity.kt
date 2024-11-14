@@ -34,8 +34,8 @@ class MainActivity : ComponentActivity() {
                 .components {
                     add(JxlDecoder.Factory())
                 }
-                .allowHardware(false)
-                .bitmapConfig(Bitmap.Config.ARGB_8888)
+                .allowHardware(true)
+//                .bitmapConfig(Bitmap.Config.ARGB_8888)
                 .build()
             JxlCoilTheme {
                 // A surface container using the 'background' color from the theme
@@ -46,21 +46,21 @@ class MainActivity : ComponentActivity() {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         AsyncImage(
                             model = ImageRequest.Builder(context = LocalContext.current)
-                                .data("https://backup-csh.fra1.digitaloceanspaces.com/pexels-emre-ug%CC%86urlar-19716967.jxl")
+                                .data("https://github.com/libjxl/conformance/raw/refs/heads/master/testcases/cafe/input.jxl")
                                 .build(),
                             contentDescription = null,
                             imageLoader = imageLoader,
                         )
                         AsyncImage(
                             model = ImageRequest.Builder(context = LocalContext.current)
-                                .data("https://backup-csh.fra1.digitaloceanspaces.com/pexels-thibaut-tattevin-18273081.jxl")
+                                .data("https://github.com/libjxl/conformance/raw/refs/heads/master/testcases/animation_icos4d/input.jxl")
                                 .build(),
                             contentDescription = null,
                             imageLoader = imageLoader,
                         )
                         AsyncImage(
                             model = ImageRequest.Builder(context = LocalContext.current)
-                                .data("https://backup-csh.fra1.digitaloceanspaces.com/dark_street.jxl")
+                                .data("https://www.earth.org.uk/img/boiler/boiler-portrait-posterised-interlaced-256w.png.jxl")
                                 .build(),
                             contentDescription = null,
                             imageLoader = imageLoader,

@@ -134,7 +134,9 @@ public class AnimatedJxlDecoder(
             ),
             preheatFrames = preheatFrames,
             firstFrameAsPlaceholder = true
-        )
+        ).apply {
+            setBounds(0, 0, dstWidth, dstHeight)
+        }
     } else {
         BitmapDrawable(
             options.context.resources,

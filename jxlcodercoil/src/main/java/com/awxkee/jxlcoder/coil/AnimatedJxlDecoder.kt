@@ -30,8 +30,8 @@ package com.awxkee.jxlcoder.coil
 
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.os.Build
+import coil3.Image
 import coil3.ImageLoader
 import coil3.asImage
 import coil3.decode.DecodeResult
@@ -42,7 +42,6 @@ import coil3.request.allowRgb565
 import coil3.request.bitmapConfig
 import coil3.size.Dimension
 import coil3.size.Scale
-import coil3.size.ScaleDrawable
 import coil3.size.Size
 import coil3.size.pxOrElse
 import com.awxkee.jxlcoder.JxlAnimatedImage
@@ -88,7 +87,7 @@ public class AnimatedJxlDecoder(
                     preferredColorConfig = mPreferredColorConfig
                 )
                 return@runInterruptible DecodeResult(
-                    ScaleDrawable(originalImage.drawable(), options.scale).asImage(),
+                    image = originalImage.toCoilImage(),
                     isSampled = false
                 )
             }
@@ -108,12 +107,10 @@ public class AnimatedJxlDecoder(
             )
 
             DecodeResult(
-                ScaleDrawable(
-                    originalImage.drawable(
-                        dstWidth = dstWidth,
-                        dstHeight = dstHeight
-                    ), options.scale
-                ).asImage(),
+                image = originalImage.toCoilImage(
+                    dstWidth = dstWidth,
+                    dstHeight = dstHeight
+                ),
                 isSampled = true
             )
         } catch (e: Exception) {
@@ -122,10 +119,10 @@ public class AnimatedJxlDecoder(
         }
     }
 
-    private fun JxlAnimatedImage.drawable(
+    private fun JxlAnimatedImage.toCoilImage(
         dstWidth: Int = 0,
         dstHeight: Int = 0
-    ): Drawable = if (numberOfFrames > 1) {
+    ): Image = if (numberOfFrames > 1) {
         AnimatedDrawable(
             frameStore = JxlAnimatedStore(
                 jxlAnimatedImage = this,
@@ -146,7 +143,7 @@ public class AnimatedJxlDecoder(
                 scaleHeight = dstHeight
             )
         )
-    }
+    }.asImage()
 
     public class Factory(
         private val preheatFrames: Int = 6,

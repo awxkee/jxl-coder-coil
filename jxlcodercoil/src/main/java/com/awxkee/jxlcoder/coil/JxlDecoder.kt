@@ -29,7 +29,6 @@
 package com.awxkee.jxlcoder.coil
 
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import coil3.ImageLoader
 import coil3.asImage
@@ -41,7 +40,7 @@ import coil3.request.allowRgb565
 import coil3.request.bitmapConfig
 import coil3.size.Dimension
 import coil3.size.Scale
-import coil3.size.ScaleDrawable
+import coil3.size.Size
 import coil3.size.pxOrElse
 import com.awxkee.jxlcoder.JxlCoder
 import com.awxkee.jxlcoder.JxlResizeFilter
@@ -54,7 +53,6 @@ import okio.ByteString.Companion.toByteString
 class JxlDecoder(
     private val source: SourceFetchResult,
     private val options: Options,
-    private val imageLoader: ImageLoader,
     private val scaleFilter: JxlResizeFilter,
     private val exceptionLogger: ((Exception) -> Unit)? = null
 ) : Decoder {
@@ -78,19 +76,15 @@ class JxlDecoder(
                 mPreferredColorConfig = PreferredColorConfig.RGBA_1010102
             }
 
-            if (options.size == coil3.size.Size.ORIGINAL || (options.size.width is Dimension.Undefined && options.size.height is Dimension.Undefined)) {
-                val originalImage =
-                    JxlCoder.decode(
-                        sourceData,
-                        preferredColorConfig = mPreferredColorConfig
-                    )
+            if (options.size == Size.ORIGINAL || (options.size.width is Dimension.Undefined && options.size.height is Dimension.Undefined)) {
+                val originalImage = JxlCoder.decode(
+                    byteArray = sourceData,
+                    preferredColorConfig = mPreferredColorConfig
+                )
+
                 return@runInterruptible DecodeResult(
-                    ScaleDrawable(
-                        BitmapDrawable(
-                            options.context.resources,
-                            originalImage
-                        ), options.scale
-                    ).asImage(), false
+                    image = originalImage.asImage(),
+                    isSampled = false
                 )
             }
 
@@ -101,22 +95,18 @@ class JxlDecoder(
                 Scale.FIT -> ScaleMode.FIT
             }
 
-            val originalImage =
-                JxlCoder.decodeSampled(
-                    sourceData,
-                    dstWidth,
-                    dstHeight,
-                    preferredColorConfig = mPreferredColorConfig,
-                    scaleMode,
-                    scaleFilter,
-                )
+            val originalImage = JxlCoder.decodeSampled(
+                byteArray = sourceData,
+                width = dstWidth,
+                height = dstHeight,
+                preferredColorConfig = mPreferredColorConfig,
+                scaleMode = scaleMode,
+                jxlResizeFilter = scaleFilter,
+            )
+
             return@runInterruptible DecodeResult(
-                ScaleDrawable(
-                    BitmapDrawable(
-                        options.context.resources,
-                        originalImage
-                    ), options.scale
-                ).asImage(), true
+                image = originalImage.asImage(),
+                isSampled = true
             )
         } catch (e: Exception) {
             exceptionLogger?.invoke(e)
@@ -127,37 +117,43 @@ class JxlDecoder(
     class Factory(
         private val scaleFilter: JxlResizeFilter = JxlResizeFilter.BILINEAR,
         private val exceptionLogger: ((Exception) -> Unit)? = null
-    ) :
-        Decoder.Factory {
+    ) : Decoder.Factory {
         override fun create(
             result: SourceFetchResult,
             options: Options,
             imageLoader: ImageLoader
         ) = if (isJXL(result.source.source())) {
-            JxlDecoder(result, options, imageLoader, scaleFilter, exceptionLogger = exceptionLogger)
+            JxlDecoder(
+                source = result,
+                options = options,
+                scaleFilter = scaleFilter,
+                exceptionLogger = exceptionLogger
+            )
         } else null
 
-        private val MAGIC_1 = byteArrayOf(0xFF.toByte(), 0x0A).toByteString()
-        private val MAGIC_2 = byteArrayOf(
-            0x0.toByte(),
-            0x0.toByte(),
-            0x0.toByte(),
-            0x0C.toByte(),
-            0x4A,
-            0x58,
-            0x4C,
-            0x20,
-            0x0D,
-            0x0A,
-            0x87.toByte(),
-            0x0A
-        ).toByteString()
+        companion object {
+            private val MAGIC_1 = byteArrayOf(0xFF.toByte(), 0x0A).toByteString()
+            private val MAGIC_2 = byteArrayOf(
+                0x0.toByte(),
+                0x0.toByte(),
+                0x0.toByte(),
+                0x0C.toByte(),
+                0x4A,
+                0x58,
+                0x4C,
+                0x20,
+                0x0D,
+                0x0A,
+                0x87.toByte(),
+                0x0A
+            ).toByteString()
 
-        private fun isJXL(source: BufferedSource): Boolean {
-            return source.rangeEquals(0, MAGIC_1) || source.rangeEquals(
-                0,
-                MAGIC_2
-            )
+            private fun isJXL(source: BufferedSource): Boolean {
+                return source.rangeEquals(0, MAGIC_1) || source.rangeEquals(
+                    0,
+                    MAGIC_2
+                )
+            }
         }
     }
 

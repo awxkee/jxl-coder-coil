@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                 .components {
                     add(JxlDecoder.Factory())
                 }
-                .allowHardware(true)
+                .allowHardware(false)
 //                .bitmapConfig(Bitmap.Config.ARGB_8888)
                 .build()
             JxlCoilTheme {

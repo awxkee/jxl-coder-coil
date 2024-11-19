@@ -143,7 +143,7 @@ class AnimatedJxlDecoder(
         )
     }.asImage()
 
-    //Note: If you want to use this decoder in order to convert image into other format, then pass enableJxlAnimation(false) to ImageRequest
+    /** Note: If you want to use this decoder in order to convert image into other format, then pass [enableJxlAnimation] with false to [ImageRequest] */
     class Factory(
         private val preheatFrames: Int = 6,
         private val scaleFilter: JxlResizeFilter = JxlResizeFilter.BILINEAR,
@@ -207,16 +207,20 @@ private fun Pair<Int, Int>.flexibleResize(
     }
 }
 
+/** Note: Only works if you use [AnimatedJxlDecoder] */
 fun ImageRequest.Builder.enableJxlAnimation(enableJxlAnimation: Boolean) = apply {
     extras[enableJxlAnimationKey] = enableJxlAnimation
 }
 
+/** Note: Only works if you use [AnimatedJxlDecoder] */
 val ImageRequest.enableJxlAnimation: Boolean
     get() = getExtra(enableJxlAnimationKey)
 
+/** Note: Only works if you use [AnimatedJxlDecoder] */
 val Options.enableJxlAnimation: Boolean
     get() = getExtra(enableJxlAnimationKey)
 
+/** Note: Only works if you use [AnimatedJxlDecoder] */
 val Extras.Key.Companion.enableJxlAnimation: Extras.Key<Boolean>
     get() = enableJxlAnimationKey
 

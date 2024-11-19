@@ -101,8 +101,8 @@ class AnimatedJxlDecoder(
 
             val (dstWidth, dstHeight) = (originalImage.getWidth() to originalImage.getHeight()).flexibleResize(
                 maxOf(
-                    options.size.width.pxOrElse { 1 },
-                    options.size.height.pxOrElse { 1 }
+                    options.size.width.pxOrElse { 0 },
+                    options.size.height.pxOrElse { 0 }
                 )
             )
 
@@ -195,6 +195,8 @@ private fun Pair<Int, Int>.flexibleResize(
     max: Int
 ): Pair<Int, Int> {
     val (width, height) = this
+
+    if(max <= 0) return this
 
     return if (height >= width) {
         val aspectRatio = width.toDouble() / height.toDouble()

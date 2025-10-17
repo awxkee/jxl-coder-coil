@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val imageLoader = ImageLoader.Builder(this)
                 .components {
-                    add(AnimatedJxlDecoder.Factory())
+                    add(JxlDecoder.Factory())
                 }
 //                .allowHardware(true)
 //                .bitmapConfig(Bitmap.Config.ARGB_8888)
@@ -49,31 +49,31 @@ class MainActivity : ComponentActivity() {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         AsyncImage(
                             model = ImageRequest.Builder(context = LocalContext.current)
-                                .data("https://github.com/libjxl/conformance/raw/refs/heads/master/testcases/cafe/input.jxl")
+                                .data("file:///android_asset/HDRTest01.jxl")
                                 .build(),
                             contentDescription = null,
                             imageLoader = imageLoader,
                             modifier = Modifier.width(250.dp).height(250.dp),
                             contentScale = ContentScale.Fit,
                         )
-                        AsyncImage(
-                            model = ImageRequest.Builder(context = LocalContext.current)
-                                .data("https://github.com/libjxl/conformance/raw/refs/heads/master/testcases/animation_icos4d/input.jxl")
-                                .build(),
-                            contentDescription = null,
-                            imageLoader = imageLoader,
-                            modifier = Modifier.width(250.dp).height(250.dp),
-                            contentScale = ContentScale.Fit,
-                        )
-                        AsyncImage(
-                            model = ImageRequest.Builder(context = LocalContext.current)
-                                .data("https://www.earth.org.uk/img/boiler/boiler-portrait-posterised-interlaced-256w.png.jxl")
-                                .build(),
-                            contentDescription = null,
-                            imageLoader = imageLoader,
-                            modifier = Modifier.width(250.dp).height(250.dp),
-                            contentScale = ContentScale.Fit,
-                        )
+//                        AsyncImage(
+//                            model = ImageRequest.Builder(context = LocalContext.current)
+//                                .data("https://github.com/libjxl/conformance/raw/refs/heads/master/testcases/animation_icos4d/input.jxl")
+//                                .build(),
+//                            contentDescription = null,
+//                            imageLoader = imageLoader,
+//                            modifier = Modifier.width(250.dp).height(250.dp),
+//                            contentScale = ContentScale.Fit,
+//                        )
+//                        AsyncImage(
+//                            model = ImageRequest.Builder(context = LocalContext.current)
+//                                .data("https://www.earth.org.uk/img/boiler/boiler-portrait-posterised-interlaced-256w.png.jxl")
+//                                .build(),
+//                            contentDescription = null,
+//                            imageLoader = imageLoader,
+//                            modifier = Modifier.width(250.dp).height(250.dp),
+//                            contentScale = ContentScale.Fit,
+//                        )
                     }
                 }
             }

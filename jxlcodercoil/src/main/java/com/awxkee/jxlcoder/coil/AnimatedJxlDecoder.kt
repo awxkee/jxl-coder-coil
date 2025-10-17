@@ -54,6 +54,8 @@ import com.awxkee.jxlcoder.animation.JxlAnimatedStore
 import kotlinx.coroutines.runInterruptible
 import okio.BufferedSource
 import okio.ByteString.Companion.toByteString
+import java.nio.ByteBuffer
+import java.nio.channels.Channels
 
 class AnimatedJxlDecoder(
     private val source: SourceFetchResult,
@@ -63,10 +65,17 @@ class AnimatedJxlDecoder(
     private val exceptionLogger: ((Exception) -> Unit)? = null,
 ) : Decoder {
 
+    fun readAllBytes(source: BufferedSource): ByteBuffer {
+        val outputBuffer = ByteBuffer.allocateDirect(source.buffer.size.toInt())
+        Channels.newChannel(source.inputStream()).read(outputBuffer)
+        return outputBuffer
+    }
+
+
     override suspend fun decode(): DecodeResult? = runInterruptible {
         try {
             // ColorSpace is preferred to be ignored due to lib is trying to handle all color profiles by itself
-            val sourceData = source.source.source().readByteArray()
+            val sourceData = readAllBytes(source.source.source())
 
             var mPreferredColorConfig: PreferredColorConfig = when (options.bitmapConfig) {
                 Bitmap.Config.ALPHA_8 -> PreferredColorConfig.RGBA_8888
@@ -84,7 +93,7 @@ class AnimatedJxlDecoder(
 
             if (options.size == Size.ORIGINAL || (options.size.width is Dimension.Undefined && options.size.height is Dimension.Undefined)) {
                 val originalImage = JxlAnimatedImage(
-                    byteArray = sourceData,
+                    byteBuffer = sourceData,
                     preferredColorConfig = mPreferredColorConfig
                 )
                 return@runInterruptible DecodeResult(
@@ -94,7 +103,7 @@ class AnimatedJxlDecoder(
             }
 
             val originalImage = JxlAnimatedImage(
-                byteArray = sourceData,
+                byteBuffer = sourceData,
                 preferredColorConfig = mPreferredColorConfig,
                 jxlResizeFilter = scaleFilter,
             )
@@ -196,7 +205,7 @@ private fun Pair<Int, Int>.flexibleResize(
 ): Pair<Int, Int> {
     val (width, height) = this
 
-    if(max <= 0) return this
+    if (max <= 0) return this
 
     return if (height >= width) {
         val aspectRatio = width.toDouble() / height.toDouble()

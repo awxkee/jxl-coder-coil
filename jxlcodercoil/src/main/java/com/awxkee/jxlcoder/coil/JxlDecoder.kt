@@ -49,7 +49,6 @@ import com.awxkee.jxlcoder.ScaleMode
 import kotlinx.coroutines.runInterruptible
 import okio.BufferedSource
 import okio.ByteString.Companion.toByteString
-import java.nio.ByteBuffer
 
 class JxlDecoder(
     private val source: SourceFetchResult,
@@ -58,14 +57,10 @@ class JxlDecoder(
     private val exceptionLogger: ((Exception) -> Unit)? = null
 ) : Decoder {
 
-    fun readAllBytes(source: BufferedSource): ByteBuffer {
-        return ByteBufferUtil.fromStream(source.inputStream())
-    }
-
     override suspend fun decode(): DecodeResult? = runInterruptible {
         try {
             // ColorSpace is preferred to be ignored due to lib is trying to handle all color profiles by itself
-            val sourceData = readAllBytes(source.source.source())
+            val sourceData = source.source.source().readByteArray()
 
             var mPreferredColorConfig: PreferredColorConfig = when (options.bitmapConfig) {
                 Bitmap.Config.ALPHA_8 -> PreferredColorConfig.RGBA_8888

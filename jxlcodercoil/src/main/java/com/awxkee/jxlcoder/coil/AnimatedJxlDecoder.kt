@@ -65,17 +65,10 @@ class AnimatedJxlDecoder(
     private val exceptionLogger: ((Exception) -> Unit)? = null,
 ) : Decoder {
 
-    fun readAllBytes(source: BufferedSource): ByteBuffer {
-        val outputBuffer = ByteBuffer.allocateDirect(source.buffer.size.toInt())
-        Channels.newChannel(source.inputStream()).read(outputBuffer)
-        return outputBuffer
-    }
-
-
     override suspend fun decode(): DecodeResult? = runInterruptible {
         try {
             // ColorSpace is preferred to be ignored due to lib is trying to handle all color profiles by itself
-            val sourceData = readAllBytes(source.source.source())
+            val sourceData = source.source.source().readByteArray()
 
             var mPreferredColorConfig: PreferredColorConfig = when (options.bitmapConfig) {
                 Bitmap.Config.ALPHA_8 -> PreferredColorConfig.RGBA_8888
@@ -93,7 +86,7 @@ class AnimatedJxlDecoder(
 
             if (options.size == Size.ORIGINAL || (options.size.width is Dimension.Undefined && options.size.height is Dimension.Undefined)) {
                 val originalImage = JxlAnimatedImage(
-                    byteBuffer = sourceData,
+                    byteArray = sourceData,
                     preferredColorConfig = mPreferredColorConfig
                 )
                 return@runInterruptible DecodeResult(
@@ -103,7 +96,7 @@ class AnimatedJxlDecoder(
             }
 
             val originalImage = JxlAnimatedImage(
-                byteBuffer = sourceData,
+                byteArray = sourceData,
                 preferredColorConfig = mPreferredColorConfig,
                 jxlResizeFilter = scaleFilter,
             )

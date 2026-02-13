@@ -65,7 +65,7 @@ android {
     }
 
     namespace = "com.awxkee.jxlcoder.coil"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 21
@@ -94,5 +94,5 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
     api("io.coil-kt.coil3:coil:3.3.0")
-    api("io.github.awxkee:jxl-coder:2.5.2")
+    api("io.github.awxkee:jxl-coder:2.6.0")
 }

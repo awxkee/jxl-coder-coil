@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         AsyncImage(
                             model = ImageRequest.Builder(context = LocalContext.current)
-                                .data("file:///android_asset/HDRTest01.jxl")
+                                .data("file:///android_asset/20140724_231427__I1C5105.jxl")
                                 .build(),
                             contentDescription = null,
                             imageLoader = imageLoader,

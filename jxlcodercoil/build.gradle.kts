@@ -1,23 +1,29 @@
 import com.vanniktech.maven.publish.AndroidMultiVariantLibrary
+import com.vanniktech.maven.publish.DeploymentValidation
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("maven-publish")
     id("signing")
-    id("com.vanniktech.maven.publish") version "0.34.0"
-}
-
-task("androidSourcesJar", Jar::class) {
-    archiveClassifier.set("sources")
-    from(android.sourceSets.getByName("main").java.srcDirs)
+    id("com.vanniktech.maven.publish") version "0.36.0"
 }
 
 mavenPublishing {
+    if (System.getenv("PUBLISH_STATE") == "Release") {
+        publishToMavenCentral(
+            automaticRelease = true,
+            validateDeployment = DeploymentValidation.PUBLISHED
+        )
+        signAllPublications()
+    }
+
     configure(
         AndroidMultiVariantLibrary(
-            sourcesJar = true,
-            publishJavadocJar = true,
+            JavadocJar.Javadoc(),
+            SourcesJar.Sources(),
         )
     )
 
@@ -81,11 +87,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        jvmToolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
     }
 }
 
@@ -93,6 +101,6 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
-    api("io.coil-kt.coil3:coil:3.3.0")
-    api("io.github.awxkee:jxl-coder:2.6.0")
+    api("io.coil-kt.coil3:coil:3.4.0")
+    api("io.github.awxkee:jxl-coder:2.6.1")
 }
